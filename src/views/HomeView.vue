@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import SearchInput from '../components/SearchInput.vue'
 
+defineProps<{
+  errorMessage?: string | null
+}>()
+
 const emit = defineEmits<{
   search: [username: string]
 }>()
@@ -26,6 +30,13 @@ const emit = defineEmits<{
         </p>
 
         <SearchInput @search="(u) => emit('search', u)" />
+
+        <div v-if="errorMessage" class="error-banner">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" class="error-icon">
+            <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+          </svg>
+          {{ errorMessage }}
+        </div>
 
         <ul class="features">
           <li class="feature-item">
@@ -123,6 +134,24 @@ const emit = defineEmits<{
 
 .feature-icon {
   color: var(--color-success-fg);
+  flex-shrink: 0;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: var(--color-danger-subtle);
+  border: 1px solid var(--color-danger-muted);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-danger-fg);
+  width: 100%;
+  max-width: 540px;
+}
+
+.error-icon {
   flex-shrink: 0;
 }
 </style>

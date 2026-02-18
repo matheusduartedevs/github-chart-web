@@ -3,23 +3,20 @@ import { computed } from 'vue'
 import UserProfileCard from '../components/UserProfileCard.vue'
 import StatCard from '../components/StatCard.vue'
 import ContributionCalendar from '../components/ContributionCalendar.vue'
-import { mockApiResponse } from '../mock/data'
 import { dailyToCalendarWeeks, computeCurrentStreak, computeLongestStreak } from '../utils/contributions'
+import type { GitHubUser } from '../types/github'
 
-defineProps<{
-  username: string
+const props = defineProps<{
+  user: GitHubUser
 }>()
 
 const emit = defineEmits<{
   back: []
 }>()
 
-const user = mockApiResponse.data
-const daily = user.contributions.daily
-
-const calendarData = computed(() => dailyToCalendarWeeks(daily))
-const currentStreak = computed(() => computeCurrentStreak(daily))
-const longestStreak = computed(() => computeLongestStreak(daily))
+const calendarData = computed(() => dailyToCalendarWeeks(props.user.contributions.daily))
+const currentStreak = computed(() => computeCurrentStreak(props.user.contributions.daily))
+const longestStreak = computed(() => computeLongestStreak(props.user.contributions.daily))
 </script>
 
 <template>
@@ -49,12 +46,12 @@ const longestStreak = computed(() => computeLongestStreak(daily))
 
     <main class="dashboard-main">
       <div class="dashboard-inner">
-        <UserProfileCard :user="user" />
+        <UserProfileCard :user="props.user" />
 
         <div class="stats-grid">
           <StatCard
             label="Total de Contribuições"
-            :value="user.stats.contributionsLastYear.toLocaleString()"
+            :value="props.user.stats.contributionsLastYear.toLocaleString()"
             description="no último ano"
             variant="success"
           />
@@ -71,14 +68,14 @@ const longestStreak = computed(() => computeLongestStreak(daily))
           />
           <StatCard
             label="Média Diária"
-            :value="user.stats.averagePerDay"
+            :value="props.user.stats.averagePerDay"
             description="contribuições / dia"
           />
         </div>
 
         <ContributionCalendar
           :weeks="calendarData.weeks"
-          :total="user.stats.contributionsLastYear"
+          :total="props.user.stats.contributionsLastYear"
           :start-date="calendarData.startDate"
         />
 
