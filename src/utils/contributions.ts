@@ -27,16 +27,14 @@ export interface CalendarData {
 }
 
 export function dailyToCalendarWeeks(daily: DailyContribution[]): CalendarData {
-  if (daily.length === 0) return { weeks: [], startDate: new Date() }
-
-  const sorted = [...daily].sort((a, b) => a.date.localeCompare(b.date))
-  const max = Math.max(...sorted.map((d) => d.contributionCount))
-
-  const countByDate = new Map<string, number>()
-  for (const d of sorted) {
-    countByDate.set(d.date, d.contributionCount)
+  if (daily.length === 0) {
+    const fallback = new Date()
+    fallback.setDate(fallback.getDate() - 52 * 7)
+    fallback.setDate(fallback.getDate() - fallback.getDay())
+    return { weeks: [], startDate: fallback }
   }
 
+  const sorted = [...daily].sort((a, b) => a.date.localeCompare(b.date))
   const firstDate = parseLocalDate(sorted[0]!.date)
   const lastDate = parseLocalDate(sorted[sorted.length - 1]!.date)
 
@@ -45,6 +43,12 @@ export function dailyToCalendarWeeks(daily: DailyContribution[]): CalendarData {
 
   const endDate = new Date(lastDate)
   endDate.setDate(endDate.getDate() + (6 - lastDate.getDay()))
+
+  const max = Math.max(...daily.map((d) => d.contributionCount))
+  const countByDate = new Map<string, number>()
+  for (const d of daily) {
+    countByDate.set(d.date, d.contributionCount)
+  }
 
   const weeks: ContributionWeek[] = []
   const current = new Date(startDate)

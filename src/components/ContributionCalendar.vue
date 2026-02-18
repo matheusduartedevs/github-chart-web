@@ -8,18 +8,25 @@ const props = defineProps<{
   startDate: Date
 }>()
 
-const monthLabels = computed(() => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const labels: { label: string; col: number }[] = []
+const monthsPt = [
+  'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+  'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+]
 
+const monthLabels = computed(() => {
+  const labels: { label: string; col: number }[] = []
   let lastMonth = -1
+  let lastYear = -1
+
   for (let w = 0; w < props.weeks.length; w++) {
-    const weekDate = new Date(props.startDate)
-    weekDate.setDate(weekDate.getDate() + w * 7)
-    const month = weekDate.getMonth()
-    if (month !== lastMonth && months[month]) {
-      labels.push({ label: months[month] as string, col: w + 1 })
+    const weekStart = new Date(props.startDate)
+    weekStart.setDate(weekStart.getDate() + w * 7)
+    const month = weekStart.getMonth()
+    const year = weekStart.getFullYear()
+    if (month !== lastMonth || year !== lastYear) {
+      labels.push({ label: monthsPt[month] as string, col: w + 1 })
       lastMonth = month
+      lastYear = year
     }
   }
 
@@ -35,7 +42,7 @@ const monthLabels = computed(() => {
     </div>
 
     <div class="calendar-scroll">
-      <div class="calendar">
+      <div class="calendar" :style="{ '--weeks-count': weeks.length }">
         <div class="month-labels">
           <span
             v-for="item in monthLabels"
@@ -123,7 +130,7 @@ const monthLabels = computed(() => {
 
 .month-labels {
   display: grid;
-  grid-template-columns: repeat(53, 14px);
+  grid-template-columns: repeat(var(--weeks-count, 53), 14px);
   gap: 3px;
   padding-left: 28px;
 }
